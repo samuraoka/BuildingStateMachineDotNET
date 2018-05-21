@@ -1,15 +1,15 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Threading;
 
 namespace ConsumerProducer
 {
     internal class Producer
     {
-        public Producer(Queue<int> q, SyncEvents e)
+        public Producer(BlockingCollection<int> q, CancellationToken t)
         {
             _queue = q;
-            _syncEvents = e;
+            _cancel = t;
         }
 
         public void ThreadRun()
@@ -17,27 +17,18 @@ namespace ConsumerProducer
             int count = 0;
             var r = new Random(Guid.NewGuid().GetHashCode());
 
-            while (CheckExitCondition() == false)
+            while (_cancel.IsCancellationRequested == false)
             {
-                lock (((ICollection)_queue).SyncRoot)
+                while (_queue.Count < 20)
                 {
-                    while (_queue.Count < 20)
-                    {
-                        _queue.Enqueue(r.Next(0, 100));
-                        _syncEvents.NewItemEvent.Set();
-                        count += 1;
-                    }
+                    _queue.Add(r.Next(0, 100));
+                    count += 1;
                 }
             }
             Console.WriteLine($"Producer thread: produced {count} items");
         }
 
-        private bool CheckExitCondition()
-        {
-            return _syncEvents.ExitThreadEvent.WaitOne(0, false);
-        }
-
-        private Queue<int> _queue;
-        private SyncEvents _syncEvents;
+        private BlockingCollection<int> _queue;
+        private CancellationToken _cancel;
     }
 }

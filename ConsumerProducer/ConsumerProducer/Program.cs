@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Threading;
 
 namespace ConsumerProducer
@@ -11,15 +10,15 @@ namespace ConsumerProducer
     {
         static void Main(string[] args)
         {
-            var queue = new Queue<int>();
-            var syncEvents = new SyncEvents();
+            var queue = new BlockingCollection<int>();
+            var endTokenSource = new CancellationTokenSource();
 
             Console.WriteLine("Configuring worker threads...");
             // Chnage from original sample:
             // Adding an additional producer to be closer to our scenario
-            var producer1 = new Producer(queue, syncEvents);
-            var producer2 = new Producer(queue, syncEvents);
-            var consumer = new Consumer(queue, syncEvents);
+            var producer1 = new Producer(queue, endTokenSource.Token);
+            var producer2 = new Producer(queue, endTokenSource.Token);
+            var consumer = new Consumer(queue, endTokenSource.Token);
             var producerThread1 = new Thread(producer1.ThreadRun)
             {
                 Name = "Producer1",
@@ -45,7 +44,7 @@ namespace ConsumerProducer
             }
 
             Console.WriteLine("Signaling threads to terminate...");
-            syncEvents.ExitThreadEvent.Set();
+            endTokenSource.Cancel();
 
             // Join all threads again to end gracefully
             producerThread1.Join();
@@ -53,16 +52,11 @@ namespace ConsumerProducer
             consumerThread.Join();
         }
 
-        private static void ShowQueueContents(Queue<int> q)
+        private static void ShowQueueContents(BlockingCollection<int> q)
         {
-            // Remarks
-            // https://docs.microsoft.com/en-us/dotnet/api/system.collections.icollection.syncroot?view=netframework-4.7.2#remarks
-            lock (((ICollection)q).SyncRoot)
+            foreach (int item in q)
             {
-                foreach (int item in q)
-                {
-                    Console.Write($"{item} ");
-                }
+                Console.Write($"{item} ");
             }
             Console.WriteLine();
         }
