@@ -45,7 +45,7 @@ namespace ConsumerProducer
             {
                 foreach (int item in q)
                 {
-                    Console.WriteLine($"{item} ");
+                    Console.Write($"{item} ");
                 }
             }
             Console.WriteLine();
