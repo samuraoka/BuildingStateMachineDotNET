@@ -2,4 +2,5 @@
 This is a demo applications for the Building State Machines in .NET by Alexander Wechsler on Pluralsight.  
 https://app.pluralsight.com/library/courses/building-state-machines-dotnet/table-of-contents
 
+* Active State Machine
 * Consumer-Producer Pattern
