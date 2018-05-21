@@ -17,7 +17,7 @@ namespace ConsumerProducer
             int count = 0;
             var r = new Random(Guid.NewGuid().GetHashCode());
 
-            while (_syncEvents.ExitThreadEvent.WaitOne(0, false) == false)
+            while (_syncEvents.ExitThreadEvent.WaitOne(0, false) == false) //TODO
             {
                 lock (((ICollection)_queue).SyncRoot)
                 {
