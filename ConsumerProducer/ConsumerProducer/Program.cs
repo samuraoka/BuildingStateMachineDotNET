@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace ConsumerProducer
 {
@@ -19,23 +20,16 @@ namespace ConsumerProducer
             var producer1 = new Producer(queue, endTokenSource.Token);
             var producer2 = new Producer(queue, endTokenSource.Token);
             var consumer = new Consumer(queue, endTokenSource.Token);
-            var producerThread1 = new Thread(producer1.ThreadRun)
+            // Create one consumer and two producers
+            var tasks = new[]
             {
-                Name = "Producer1",
-            };
-            var producerThread2 = new Thread(producer2.ThreadRun)
-            {
-                Name = "Producer2",
-            };
-            var consumerThread = new Thread(consumer.ThreadRun)
-            {
-                Name = "Consumer",
+                new Task(producer1.ThreadRun),
+                new Task(producer2.ThreadRun),
+                new Task(consumer.ThreadRun),
             };
 
             Console.WriteLine("Launching producer and consumer threads...");
-            producerThread1.Start();
-            producerThread2.Start();
-            consumerThread.Start();
+            Array.ForEach(tasks, t => t.Start());
 
             for (int i = 0; i < 4; i += 1)
             {
@@ -47,9 +41,7 @@ namespace ConsumerProducer
             endTokenSource.Cancel();
 
             // Join all threads again to end gracefully
-            producerThread1.Join();
-            producerThread2.Join();
-            consumerThread.Join();
+            Task.WaitAll(tasks);
         }
 
         private static void ShowQueueContents(BlockingCollection<int> q)
