@@ -16,9 +16,7 @@ namespace ConsumerProducer
         public void ThreadRun()
         {
             int count = 0;
-            // Remarks - WaitHandle.WaitAny Method
-            // https://docs.microsoft.com/en-us/dotnet/api/system.threading.waithandle.waitany?view=netframework-4.7.2#System_Threading_WaitHandle_WaitAny_System_Threading_WaitHandle___
-            while (WaitHandle.WaitAny(_syncEvents.EventArray) != 1) //TODO
+            while (CheckExitCondition() == false)
             {
                 lock (((ICollection)_queue).SyncRoot)
                 {
@@ -27,6 +25,13 @@ namespace ConsumerProducer
                 count += 1;
             }
             Console.WriteLine($"Consumer Thread: consumed {count} items");
+        }
+
+        private bool CheckExitCondition()
+        {
+            // Remarks - WaitHandle.WaitAny Method
+            // https://docs.microsoft.com/en-us/dotnet/api/system.threading.waithandle.waitany?view=netframework-4.7.2#System_Threading_WaitHandle_WaitAny_System_Threading_WaitHandle___
+            return WaitHandle.WaitAny(_syncEvents.EventArray) == 1;
         }
 
         private Queue<int> _queue;

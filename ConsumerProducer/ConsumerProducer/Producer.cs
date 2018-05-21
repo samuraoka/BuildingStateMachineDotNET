@@ -17,7 +17,7 @@ namespace ConsumerProducer
             int count = 0;
             var r = new Random(Guid.NewGuid().GetHashCode());
 
-            while (_syncEvents.ExitThreadEvent.WaitOne(0, false) == false) //TODO
+            while (CheckExitCondition() == false)
             {
                 lock (((ICollection)_queue).SyncRoot)
                 {
@@ -30,6 +30,11 @@ namespace ConsumerProducer
                 }
             }
             Console.WriteLine($"Producer thread: produced {count} items");
+        }
+
+        private bool CheckExitCondition()
+        {
+            return _syncEvents.ExitThreadEvent.WaitOne(0, false);
         }
 
         private Queue<int> _queue;
