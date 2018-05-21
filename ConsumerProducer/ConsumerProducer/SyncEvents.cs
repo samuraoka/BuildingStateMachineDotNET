@@ -6,13 +6,17 @@ namespace ConsumerProducer
     {
         public SyncEvents()
         {
-            //TODO
+            NewItemEvent = new AutoResetEvent(false);
             ExitThreadEvent = new ManualResetEvent(false);
-            //TODO
+            EventArray = new WaitHandle[]
+            {
+                NewItemEvent,
+                ExitThreadEvent,
+            };
         }
 
-        //TODO
         public EventWaitHandle ExitThreadEvent { get; }
-        //TODO
+        public EventWaitHandle NewItemEvent { get; }
+        public WaitHandle[] EventArray { get; }
     }
 }
