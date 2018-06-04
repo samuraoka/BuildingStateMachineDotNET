@@ -17,10 +17,10 @@ namespace ApplicationServices
         public IViewStateConfiguration ViewStateConfiguration { get; set; }
 
         #region singleton implementation
-        private static Lazy<ViewManager> _viewManager
+        private static readonly Lazy<ViewManager> _viewManager
             = new Lazy<ViewManager>(() => new ViewManager());
 
-        public ViewManager Instance
+        public static ViewManager Instance
         {
             get
             {
