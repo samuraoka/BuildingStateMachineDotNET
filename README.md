@@ -3,3 +3,5 @@ This is a demo applications for the [Building State Machines in .NET](https://ap
 
 * Active State Machine
 * Consumer-Producer Pattern
+* Event handling
+* Reflection
